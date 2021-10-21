@@ -15,6 +15,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -43,6 +44,7 @@ public class JwtController {
 	@Autowired JwtUtil jwtUtil;
 
 	@PostMapping("/register")
+	@CrossOrigin(origins = {"http://127.0.0.1:5500/"})
 	public Response register(@RequestBody HashMap<String, User> requestBody) {
 		User user = requestBody.get("data");
 		Optional<User> repoUser = userRepository.findByUsername(user.getUsername());
@@ -67,6 +69,7 @@ public class JwtController {
 	}
 
 	@PostMapping("/login")
+	@CrossOrigin(origins = {"http://127.0.0.1:5500/"})
 	public Response login(@RequestBody HashMap<String, LoginRequest> requestBody) {
 		var loginInformation = requestBody.get("data");
 		var username = loginInformation.getUsername();
@@ -91,7 +94,15 @@ public class JwtController {
 		return new Response(responseResult);
 	}
 
+	@GetMapping("/logout")
+	@CrossOrigin(origins = {"http://127.0.0.1:5500/"})
+	public Response logout(){
+		SecurityContextHolder.clearContext();
+		return new Response();
+	}
+
 	@GetMapping("/secure")
+	@CrossOrigin(origins = {"http://127.0.0.1:5500/"})
 	public Response secure() {
 		var response = new HashMap<String, Object>();
 		response.put("foo", "bar");

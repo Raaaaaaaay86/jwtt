@@ -20,7 +20,7 @@ public class JwtUtil {
 	private final String CLAIMS_KEY_USER_ROLES = "userRoles";
 
 	public String createToken(String userName, List<String> userRoles) {
-		int oneDaySeconds = 86400;
+		int oneDaySeconds = 10;
 
 		return Jwts.builder()
 				.setSubject(userName)
@@ -38,6 +38,16 @@ public class JwtUtil {
 				.build()
 				.parseClaimsJws(token)
 				.getBody();
+	}
+
+	public Boolean isJwtExpired(String token) {
+		return Jwts.parserBuilder()
+				.setSigningKey(Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8)))
+				.build()
+				.parseClaimsJws(token)
+				.getBody()
+				.getExpiration()
+				.before(new Date());
 	}
 
 	public String parseUserNameFromToken(String token) {
