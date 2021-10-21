@@ -1,5 +1,6 @@
 package com.example.jwtt.filter;
 
+import com.example.jwtt.controller.JwtController;
 import com.example.jwtt.service.security.UserDetailsImpl;
 import com.example.jwtt.utils.jwt.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 			String userName = jwtUtil.parseUserNameFromToken(token);
 			List<SimpleGrantedAuthority> userAuthorities = jwtUtil.parseUserAuthoritiesFromToken(token);
 			UserDetails userDetails = new UserDetailsImpl(userName, null, userAuthorities);
+
+			List<String> roles = jwtUtil.parseToken(token).get("userRoles", List.class);
+
+			if (!jwtUtil.isJwtExpired(token)) {
+				var newToken = jwtUtil.createToken(userName, roles);
+				response.setHeader("Authorization", newToken);
+			}
 
 			UsernamePasswordAuthenticationToken authAfterSuccessLogin = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 			authAfterSuccessLogin.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

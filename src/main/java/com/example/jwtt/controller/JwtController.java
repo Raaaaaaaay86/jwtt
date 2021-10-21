@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -70,7 +71,7 @@ public class JwtController {
 
 	@PostMapping("/login")
 	@CrossOrigin(origins = {"http://127.0.0.1:5500/"})
-	public Response login(@RequestBody HashMap<String, LoginRequest> requestBody) {
+	public Response login(@RequestBody HashMap<String, LoginRequest> requestBody, HttpServletResponse response) {
 		var loginInformation = requestBody.get("data");
 		var username = loginInformation.getUsername();
 		var password = loginInformation.getPassword();
@@ -89,8 +90,11 @@ public class JwtController {
 		responseResult.put("username", username);
 		responseResult.put("password", password);
 		responseResult.put("userRoles", userRoles);
-		responseResult.put("token", jwtUtil.createToken(username, userRoles));
+		var jwtToken = jwtUtil.createToken(username, userRoles);
+		responseResult.put("token", jwtToken);
+		responseResult.put("please_check_response_header_authorization!", jwtToken);
 
+		response.setHeader("Authorization", jwtToken);
 		return new Response(responseResult);
 	}
 

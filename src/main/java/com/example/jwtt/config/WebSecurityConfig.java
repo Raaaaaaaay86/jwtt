@@ -15,6 +15,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.header.writers.StaticHeadersWriter;
 
 @Configuration
 @EnableWebSecurity
@@ -32,7 +33,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers(HttpMethod.GET, "/jwt/**").authenticated()
 				.antMatchers(HttpMethod.POST, "/jwt/**").permitAll()
 				.and().cors()
-				.and().csrf().disable();
+				.and().csrf().disable()
+				.headers()
+				.addHeaderWriter(new StaticHeadersWriter("Access-Control-Allow-Origin", "*"))
+				.addHeaderWriter(new StaticHeadersWriter("Access-Control-Allow-Methods", "POST, GET"))
+				.addHeaderWriter(new StaticHeadersWriter("Access-Control-Max-Age", "3600"))
+				.addHeaderWriter(new StaticHeadersWriter("Access-Control-Allow-Credentials", "true"))
+				.addHeaderWriter(new StaticHeadersWriter("Access-Control-Allow-Headers", "Origin,Accept,X-Requested-With,Content-Type,Access-Control-Request-Method,Access-Control-Request-Headers,Authorization"))
+				.addHeaderWriter(new StaticHeadersWriter("Access-Control-Expose-Headers", "Authorization"));
 
 		http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 	}
